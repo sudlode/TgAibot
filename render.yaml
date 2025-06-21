@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: fullstack-app
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: MONGO_URL
+        value: mongodb://localhost:27017
+      - key: DB_NAME
+        value: production_db
+      - key: NODE_ENV
+        value: production
