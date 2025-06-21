@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
+function App() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const helloWorldApi = async () => {
     try {
@@ -16,9 +16,11 @@ const Home = () => {
       const response = await axios.get(`${API}/`);
       console.log("API response:", response.data);
       setMessage(response.data.message);
+      setError(null);
     } catch (e) {
       console.error("API Error:", e);
       setMessage("API connection failed");
+      setError(e.message);
     } finally {
       setLoading(false);
     }
@@ -40,29 +42,49 @@ const Home = () => {
           <img 
             src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" 
             alt="Emergent Logo"
-            className="w-24 h-24 rounded-full"
+            style={{width: '96px', height: '96px', borderRadius: '50%'}}
           />
         </a>
-        <p className="mt-5 text-xl">Building something incredible ~!</p>
-        <div className="mt-4 p-4 bg-green-100 rounded-lg">
+        <p className="mt-5" style={{fontSize: '1.25rem', marginTop: '1.25rem'}}>
+          Building something incredible ~!
+        </p>
+        <div 
+          className="mt-4 p-4" 
+          style={{
+            marginTop: '1rem',
+            padding: '1rem',
+            backgroundColor: loading ? '#f3f4f6' : (error ? '#fee2e2' : '#dcfce7'),
+            borderRadius: '0.5rem',
+            maxWidth: '400px'
+          }}
+        >
           {loading ? (
-            <p className="text-gray-700">Loading API...</p>
+            <p style={{color: '#374151'}}>Loading API...</p>
+          ) : error ? (
+            <p style={{color: '#dc2626'}}>Error: {error}</p>
           ) : (
-            <p className="text-green-700">API Response: {message}</p>
+            <p style={{color: '#16a34a'}}>✅ API Response: {message}</p>
           )}
+        </div>
+        
+        <div style={{marginTop: '2rem'}}>
+          <button 
+            onClick={helloWorldApi}
+            style={{
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            Test API Connection
+          </button>
         </div>
       </header>
     </div>
-  );
-};
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </BrowserRouter>
   );
 }
 
