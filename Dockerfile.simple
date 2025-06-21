@@ -1,0 +1,43 @@
+# Simple Dockerfile для швидкого деплою
+FROM python:3.11-slim
+
+# Install Node.js та system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    gcc \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g yarn \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy and install backend dependencies
+COPY backend/requirements.txt ./backend/
+RUN pip install --no-cache-dir -r backend/requirements.txt
+
+# Copy and install frontend dependencies
+COPY frontend/package.json ./frontend/
+WORKDIR /app/frontend
+RUN yarn install --production=false
+
+# Copy all source code
+WORKDIR /app
+COPY backend/ ./backend/
+COPY frontend/ ./frontend/
+
+# Build frontend
+WORKDIR /app/frontend
+RUN yarn build
+
+# Create startup script
+WORKDIR /app
+RUN echo '#!/bin/bash\ncd /app/backend && uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000}' > start.sh
+RUN chmod +x start.sh
+
+# Expose port
+EXPOSE 8000
+
+# Start command
+CMD ["./start.sh"]
