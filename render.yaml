@@ -2,7 +2,7 @@ services:
   - type: web
     name: fullstack-app
     env: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./Dockerfile.simple
     envVars:
       - key: MONGO_URL
         value: mongodb://localhost:27017
